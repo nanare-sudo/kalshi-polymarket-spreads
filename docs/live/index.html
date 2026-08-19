@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Neuronaldensity — Live Probability Terminal | Kalshi &amp; Polymarket</title>
+<meta name="description" content="A live terminal showing what prediction markets think will happen: probabilities from Kalshi and Polymarket, cross-venue price differences, and weather markets joined with real station observations.">
+<link rel="canonical" href="https://nanare-sudo.github.io/kalshi-polymarket-spreads/live/">
+<meta property="og:title" content="Neuronaldensity — Live Probability Terminal">
+<meta property="og:description" content="What the world's prediction markets think will happen — live, from Kalshi and Polymarket.">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --bg:#07090c; --panel:#0c1015; --line:#1b2129; --line2:#232b35;
+  --fg:#e6ecf2; --mut:#7d8996; --dim:#4a555f;
+  --up:#22c55e; --down:#ef4444; --acc:#38bdf8; --warn:#f59e0b;
+  --k:#7c9cff; --p:#c084fc;
+  --mono:"SF Mono",ui-monospace,"JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--mono);
+  font-size:15px; line-height:1.45; overflow-x:hidden;
+  background-image:radial-gradient(ellipse 120% 80% at 50% -20%,#0f1720 0%,transparent 60%);
+}
+.scan{position:fixed;inset:0;pointer-events:none;z-index:99;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.014) 0 1px,transparent 1px 3px);}
+.wrap{max-width:1560px;margin:0 auto;padding:18px 20px 40px}
+
+header{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
+  border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px}
+.brand{font-size:17px;font-weight:700;letter-spacing:.18em}
+.brand span{color:var(--acc)}
+.tag{color:var(--mut);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;
+  color:var(--mut);letter-spacing:.1em}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--up);
+  box-shadow:0 0 10px var(--up);animation:pulse 2.6s ease-in-out infinite}
+.dot.stale{background:var(--warn);box-shadow:0 0 10px var(--warn)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+@media(max-width:1080px){.grid{grid-template-columns:1fr}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.phead{display:flex;align-items:center;gap:10px;padding:9px 14px;
+  border-bottom:1px solid var(--line);background:linear-gradient(180deg,#111820,transparent)}
+.phead h2{font-size:11.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--fg)}
+.phead .n{margin-left:auto;font-size:11px;color:var(--dim)}
+.pbody{padding:6px 0}
+
+/* Probability wall */
+.wall{padding:8px 14px}
+.row{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;
+  padding:5px 0;border-bottom:1px solid #10161d;animation:fade .5s ease}
+.row:last-child{border-bottom:none}
+@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.pct{font-size:16px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.bar-wrap{position:relative}
+.bar{height:3px;background:#151c24;border-radius:2px;overflow:hidden;margin-bottom:4px}
+.bar i{display:block;height:100%;border-radius:2px;
+  background:linear-gradient(90deg,var(--acc),#5eead4);transition:width .9s cubic-bezier(.4,0,.2,1)}
+.q{font-size:12.5px;color:#c3ccd6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{font-size:10.5px;color:var(--dim);letter-spacing:.04em;margin-top:1px}
+.v-k{color:var(--k)}.v-p{color:var(--p)}
+
+/* Active list */
+.list{padding:4px 14px}
+.item{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+  padding:7px 0;border-bottom:1px solid #10161d}
+.item:last-child{border-bottom:none}
+.item .q{font-size:12.5px}
+.big{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+
+/* Gaps */
+.gap{padding:11px 14px;border-bottom:1px solid #10161d}
+.gap:last-child{border-bottom:none}
+.gap .q{font-size:12.5px;white-space:normal;margin-bottom:7px}
+.venues{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.ven{display:flex;flex-direction:column;gap:1px}
+.ven b{font-size:17px;font-variant-numeric:tabular-nums}
+.ven small{font-size:9.5px;letter-spacing:.16em;color:var(--dim)}
+.delta{text-align:center;font-size:12px;color:var(--warn);font-weight:700;
+  border:1px solid #2a2418;background:#15120b;border-radius:2px;padding:3px 8px;white-space:nowrap}
+
+/* Weather */
+.wx{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px;background:var(--line)}
+.city{background:var(--panel);padding:11px 13px}
+.city h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#dbe3ea;margin-bottom:2px}
+.temp{font-size:27px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.temp small{font-size:12px;color:var(--mut);font-weight:400}
+.stn{font-size:9.5px;color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
+.mk{display:flex;justify-content:space-between;font-size:11px;padding:2px 0;color:#aab4bf}
+.mk b{font-variant-numeric:tabular-nums;color:#e6ecf2}
+
+footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--line);
+  display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--dim)}
+footer a{color:var(--mut);text-decoration:none;border-bottom:1px solid var(--line2)}
+footer a:hover{color:var(--acc)}
+.note{font-size:10.5px;color:var(--dim);padding:7px 14px;border-top:1px solid var(--line);line-height:1.5}
+.err{color:var(--warn);padding:14px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="scan"></div>
+<div class="wrap">
+
+<header>
+  <div class="brand">NEURONAL<span>DENSITY</span></div>
+  <div class="tag">Live Probability Terminal</div>
+  <div class="live"><span class="dot" id="dot"></span><span id="age">connecting…</span></div>
+</header>
+
+<div class="grid">
+  <section class="panel">
+    <div class="phead"><h2>What the market thinks will happen</h2><span class="n" id="wallN"></span></div>
+    <div class="wall" id="wall"><div class="err">loading…</div></div>
+  </section>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <section class="panel">
+      <div class="phead"><h2>Most traded right now</h2><span class="n" id="actN"></span></div>
+      <div class="list" id="active"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Cross-venue differences</h2><span class="n" id="gapN"></span></div>
+      <div id="gaps"></div>
+      <div class="note">Observed price difference between venues for markets our matcher considers
+        equivalent. This is <b>not</b> an executable spread — fees, orderbook depth and differing
+        resolution rules are not applied here.</div>
+    </section>
+  </div>
+</div>
+
+<section class="panel" style="margin-top:16px">
+  <div class="phead"><h2>Weather markets × station observations</h2><span class="n" id="wxN"></span></div>
+  <div class="wx" id="wx"></div>
+  <div class="note">Live temperature from the NWS/METAR station Kalshi's market region refers to,
+    next to the market's own probabilities. Since 2026-08-14 Kalshi settles daily temperature
+    markets on The Weather Company data — station readings here are a real-time indicator, not the
+    settlement value.</div>
+</section>
+
+<footer>
+  <span>Sources: Kalshi trade-api v2 · Polymarket Gamma · NWS/METAR (US public domain)</span>
+  <a href="../">Methodology &amp; data</a>
+  <a href="https://github.com/nanare-sudo/kalshi-polymarket-spreads">GitHub</a>
+  <a href="https://apify.com/nanare-sudo/prediction-spread-scanner?utm_source=live_terminal&utm_medium=organic&utm_campaign=neuronaldensity&utm_content=footer">Structured data / API</a>
+  <span style="margin-left:auto">Market data for research. Not trading advice.</span>
+</footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const fmt = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(0)+'k' : String(n);
+const esc = s => (s||'').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+const vcls = v => v === 'kalshi' ? 'v-k' : 'v-p';
+const vname = v => v === 'kalshi' ? 'KALSHI' : 'POLYMARKET';
+
+let DATA = null, wallIdx = 0, actIdx = 0;
+
+async function load() {
+  try {
+    const r = await fetch('../data/live.json?t=' + Date.now(), {cache: 'no-store'});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    DATA = await r.json();
+    render();
+  } catch (e) {
+    $('#age').textContent = 'data unavailable';
+    $('#dot').classList.add('stale');
+    if (!DATA) $('#wall').innerHTML = '<div class="err">Data temporarily unavailable — retrying.</div>';
+  }
+}
+
+function ageLabel() {
+  if (!DATA) return '';
+  const mins = Math.max(0, Math.round((Date.now() - new Date(DATA.generated_at)) / 60000));
+  $('#dot').classList.toggle('stale', mins > 45);
+  return mins < 1 ? 'updated just now'
+       : mins < 60 ? `updated ${mins} min ago`
+       : `data delayed — last update ${DATA.generated_at.slice(11,16)} UTC`;
+}
+
+function render() {
+  if (!DATA) return;
+  $('#age').textContent = ageLabel();
+  const c = DATA.counts || {};
+  $('#wallN').textContent = `${(c.kalshi||0) + (c.polymarket||0)} markets scanned`;
+
+  // Probability wall — rotating window
+  const wall = DATA.probability_wall || [];
+  const N = 14;
+  const view = wall.length > N ? Array.from({length: N}, (_, i) => wall[(wallIdx + i) % wall.length]) : wall;
+  $('#wall').innerHTML = view.map(m => `
+    <div class="row">
+      <div class="pct">${m.prob.toFixed(0)}%</div>
+      <div class="bar-wrap">
+        <div class="bar"><i style="width:${m.prob}%"></i></div>
+        <div class="q" title="${esc(m.title)}">${esc(m.title)}</div>
+        <div class="meta"><span class="${vcls(m.venue)}">${vname(m.venue)}</span> · vol 24h ${fmt(m.vol24)}</div>
+      </div>
+    </div>`).join('');
+
+  // Most active — rotating window
+  const act = DATA.most_active || [];
+  const A = 9;
+  const aview = act.length > A ? Array.from({length: A}, (_, i) => act[(actIdx + i) % act.length]) : act;
+  $('#actN').textContent = `${act.length} tracked`;
+  $('#active').innerHTML = aview.map(m => `
+    <div class="item">
+      <div>
+        <div class="q" title="${esc(m.title)}">${esc(m.title)}</div>
+        <div class="meta"><span class="${vcls(m.venue)}">${vname(m.venue)}</span> · vol 24h ${fmt(m.vol24)}</div>
+      </div>
+      <div class="big">${m.prob.toFixed(0)}<small style="font-size:11px;color:var(--mut)">%</small></div>
+    </div>`).join('');
+
+  // Cross-venue
+  const gaps = DATA.cross_venue || [];
+  $('#gapN').textContent = gaps.length ? `${gaps.length} matched pair${gaps.length > 1 ? 's' : ''}` : 'none right now';
+  $('#gaps').innerHTML = gaps.length ? gaps.slice(0, 4).map(g => `
+    <div class="gap">
+      <div class="q">${esc(g.kalshi.title)}</div>
+      <div class="venues">
+        <div class="ven"><small class="v-k">KALSHI</small><b>${g.kalshi.prob.toFixed(1)}%</b></div>
+        <div class="delta">${g.gap_pp.toFixed(1)} pp</div>
+        <div class="ven" style="text-align:right"><small class="v-p">POLYMARKET</small><b>${g.polymarket.prob.toFixed(1)}%</b></div>
+      </div>
+    </div>`).join('')
+    : `<div class="note" style="border-top:none">No pairs cleared the matching threshold in this scan.
+       Equivalent contracts across venues are rarer than they look — most apparent matches differ in
+       resolution rules or refer to different outcomes of the same question.</div>`;
+
+  // Weather
+  const wx = DATA.weather || [];
+  $('#wxN').textContent = `${wx.length} cities`;
+  $('#wx').innerHTML = wx.map(c => `
+    <div class="city">
+      <h3>${esc(c.city)}</h3>
+      <div class="temp">${c.temp_f != null ? c.temp_f.toFixed(1) : '—'}<small>°F</small></div>
+      <div class="stn">${esc(c.station)}${c.temp_c != null ? ' · ' + c.temp_c.toFixed(1) + '°C' : ''}</div>
+      ${(c.markets || []).slice(0, 4).map(m => `
+        <div class="mk"><span>${esc((m.sub || m.title).slice(0, 26))}</span><b>${m.prob.toFixed(0)}%</b></div>`).join('')}
+    </div>`).join('');
+}
+
+// Slow ambient rotation — designed for second-monitor viewing, no jarring motion
+setInterval(() => { wallIdx += 2; render(); }, 12000);
+setInterval(() => { actIdx += 3; render(); }, 17000);
+setInterval(() => { $('#age').textContent = ageLabel(); }, 30000);
+setInterval(load, 5 * 60 * 1000);
+load();
+</script>
+</body>
+</html>
