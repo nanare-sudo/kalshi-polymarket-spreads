@@ -1,0 +1,6 @@
+ts,kind,name,users_total,users30,users7,runs30,runs30_ok,runs30_failed,reviews,rating,bookmarks,stars,forks,views14,uniques14,clones14,referrers,state,merged,comments
+2026-08-19 12:06,actor,kalshi-weather-markets,2,1,1,1,1,0,0,0,0,,,,,,,,,
+2026-08-19 12:06,actor,prediction-spread-scanner,2,1,1,1,1,0,0,0,0,,,,,,,,,
+2026-08-19 12:06,actor,pdf-text-extractor-rag,2,1,1,0,0,0,0,0,0,,,,,,,,,
+2026-08-19 12:06,github,nanare-sudo/kalshi-polymarket-spreads,,,,,,,,,,0,0,0,0,0,,,,
+2026-08-19 12:06,pr,aarora4/Awesome-Prediction-Market-Tools#180,,,,,,,,,,,,,,,,open,False,0
