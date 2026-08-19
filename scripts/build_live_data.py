@@ -294,9 +294,61 @@ def main():
 
     # Nur ungewisse Märkte: bereits entschiedene 100%/0%-Märkte sind visuell wertlos
     live = [m for m in kalshi + poly if 3 <= m["prob"] <= 97]
-    active = sorted(live, key=lambda m: -m["vol24"])[:40]
+
+    def topic(m):
+        """Grobe Themenzuordnung für Vielfalt — Esports darf das Bild nicht dominieren."""
+        t = (m["title"] + " " + m.get("event_title", "")).lower()
+        if re.search(r"\b(lol|dota|counter-strike|cs2|esports|valorant|bo3|bo5|game \d)\b", t):
+            return "esports"
+        if re.search(r"\b(nfl|nba|mlb|nhl|soccer|tennis|golf|ufc|f1|premier league|world cup)\b", t):
+            return "sports"
+        if re.search(r"\b(bitcoin|btc|ethereum|eth|crypto|solana|xrp|coin)\b", t):
+            return "crypto"
+        if re.search(r"\b(fed|inflation|cpi|gdp|rate|recession|jobs|unemploy|tariff|s&p|nasdaq)\b", t):
+            return "economy"
+        if re.search(r"\b(openai|anthropic|ai |gpt|llm|nvidia|apple|google|tesla|spacex|launch|nasa)\b", t):
+            return "tech"
+        if re.search(r"\b(temperature|rain|snow|hurricane|weather|high in|low in)\b", t):
+            return "weather"
+        if re.search(r"\b(election|president|senate|congress|nominee|parliament|minister|ceasefire|war)\b", t):
+            return "politics"
+        return "other"
+
+    def pick(pool, n, per_topic):
+        """Top-n nach Volumen, aber höchstens per_topic je Thema und keine Titel-Dubletten."""
+        out, tcount, seen = [], {}, set()
+        for m in sorted(pool, key=lambda m: -m["vol24"]):
+            key = (m["title"] + m["sub"]).lower()[:80]
+            if key in seen:
+                continue
+            tp = topic(m)
+            if tcount.get(tp, 0) >= per_topic:
+                continue
+            seen.add(key)
+            out.append(m)
+            tcount[tp] = tcount.get(tp, 0) + 1
+            if len(out) >= n:
+                break
+        return out
+
+    def interleave(a, b, n):
+        """Beide Venues abwechselnd — Polymarkets Volumen würde Kalshi sonst komplett verdrängen."""
+        out, i = [], 0
+        while len(out) < n and (i < len(a) or i < len(b)):
+            if i < len(a):
+                out.append(a[i])
+            if len(out) < n and i < len(b):
+                out.append(b[i])
+            i += 1
+        return out[:n]
+
+    k_live = [m for m in live if m["venue"] == "kalshi"]
+    p_live = [m for m in live if m["venue"] == "polymarket"]
+
+    active = interleave(pick(p_live, 24, 4), pick(k_live, 24, 4), 36)
     # Probability Wall: über alle Wahrscheinlichkeits-Dekaden streuen statt nur Extremwerte
-    pool = sorted([m for m in live if m["vol24"] > 300], key=lambda m: -m["vol24"])[:250]
+    pool = interleave(pick([m for m in p_live if m["vol24"] > 100], 70, 10),
+                      pick([m for m in k_live if m["vol24"] > 20], 70, 10), 120)
     buckets = {}
     for m in pool:
         buckets.setdefault(int(m["prob"] // 10), []).append(m)
