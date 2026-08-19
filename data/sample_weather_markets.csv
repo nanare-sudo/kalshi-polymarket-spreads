@@ -1,0 +1,13 @@
+ticker,title,yes_bid,yes_ask,last_price,volume_24h,strike_type,floor_strike,cap_strike,station,station_temp_f,temp_trend_3h_f,distance_to_strike_f,close_time
+KXHIGHNY-26AUG19-T92,"Will the maximum temperature be >92° on Aug 19, 2026?",0,0.01,0.01,1273,greater,92,,KNYC,73.9,-1.1,-18.1,2026-08-20T05:00:00Z
+KXHIGHNY-26AUG19-T85,"Will the maximum temperature be <85° on Aug 19, 2026?",0.11,0.13,0.11,4960.82,less,,85,KNYC,73.9,-1.1,-11.1,2026-08-20T05:00:00Z
+KXHIGHNY-26AUG19-B91.5,"Will the maximum temperature be 91-92° on Aug 19, 2026?",0,0.01,0.01,1166.64,between,91,92,KNYC,73.9,-1.1,-17.1,2026-08-20T05:00:00Z
+KXHIGHNY-26AUG19-B89.5,"Will the maximum temperature be 89-90° on Aug 19, 2026?",0.01,0.02,0.02,5265.61,between,89,90,KNYC,73.9,-1.1,-15.1,2026-08-20T05:00:00Z
+KXHIGHNY-26AUG19-B87.5,"Will the maximum temperature be 87-88° on Aug 19, 2026?",0.27,0.29,0.29,3416.18,between,87,88,KNYC,73.9,-1.1,-13.1,2026-08-20T05:00:00Z
+KXHIGHNY-26AUG19-B85.5,"Will the maximum temperature be 85-86° on Aug 19, 2026?",0.59,0.62,0.62,3996.23,between,85,86,KNYC,73.9,-1.1,-11.1,2026-08-20T05:00:00Z
+KXHIGHCHI-26AUG19-T81,"Will the maximum temperature be >81° on Aug 19, 2026?",0.16,0.17,0.17,4007.78,greater,81,,KMDW,68,0,-13,2026-08-20T06:00:00Z
+KXHIGHCHI-26AUG19-T74,"Will the maximum temperature be <74° on Aug 19, 2026?",0,0.01,0.01,849.92,less,,74,KMDW,68,0,-6,2026-08-20T06:00:00Z
+KXHIGHCHI-26AUG19-B80.5,"Will the maximum temperature be 80-81° on Aug 19, 2026?",0.21,0.22,0.22,2658.96,between,80,81,KMDW,68,0,-12,2026-08-20T06:00:00Z
+KXHIGHCHI-26AUG19-B78.5,"Will the maximum temperature be 78-79° on Aug 19, 2026?",0.44,0.45,0.45,1849.72,between,78,79,KMDW,68,0,-10,2026-08-20T06:00:00Z
+KXHIGHCHI-26AUG19-B76.5,"Will the maximum temperature be 76-77° on Aug 19, 2026?",0.11,0.13,0.12,919.19,between,76,77,KMDW,68,0,-8,2026-08-20T06:00:00Z
+KXHIGHCHI-26AUG19-B74.5,"Will the maximum temperature be 74-75° on Aug 19, 2026?",0.02,0.03,0.04,971.59,between,74,75,KMDW,68,0,-6,2026-08-20T06:00:00Z

@@ -1,0 +1,127 @@
+[
+  {
+    "pair_id": "KXPRESNOMD-28-AOC__559653",
+    "direction": "buy_yes_kalshi_sell_polymarket",
+    "gross_spread_midpoint": 0.022,
+    "executable_spread_100": 0.0057,
+    "executable_spread_1000": 0.0006,
+    "fees_total": {
+      "100": 5.74,
+      "1000": 57.4
+    },
+    "depth_limited": false,
+    "match_confidence": 0.841,
+    "signal": false,
+    "kalshi": {
+      "ticker": "KXPRESNOMD-28-AOC",
+      "title": "Will Alexandria Ocasio-Cortez be the Democratic Presidential nominee in 2028?",
+      "best_bid": 0.17,
+      "best_ask": 0.18
+    },
+    "polymarket": {
+      "question": "Will Alexandria Ocasio-Cortez win the 2028 Democratic presidential nomination?",
+      "best_bid": 0.196,
+      "best_ask": 0.198
+    }
+  },
+  {
+    "pair_id": "KXPRESNOMD-28-CMUR__559691",
+    "direction": "buy_yes_polymarket_sell_kalshi",
+    "gross_spread_midpoint": 0.0035,
+    "executable_spread_100": 0.0006,
+    "executable_spread_1000": -0.0001,
+    "fees_total": {
+      "100": 8.3887,
+      "1000": 73.1952
+    },
+    "depth_limited": false,
+    "match_confidence": 0.837,
+    "signal": false,
+    "kalshi": {
+      "ticker": "KXPRESNOMD-28-CMUR",
+      "title": "Will Chris Murphy be the Democratic Presidential nominee in 2028?",
+      "best_bid": 0.006,
+      "best_ask": 0.007
+    },
+    "polymarket": {
+      "question": "Will Chris Murphy win the 2028 Democratic presidential nomination?",
+      "best_bid": 0.002,
+      "best_ask": 0.004
+    }
+  },
+  {
+    "pair_id": "KXPRESNOMD-28-WM__559656",
+    "direction": "buy_yes_polymarket_sell_kalshi",
+    "gross_spread_midpoint": 0.006,
+    "executable_spread_100": -0.0004,
+    "executable_spread_1000": -0.0094,
+    "fees_total": {
+      "100": 7.2222,
+      "1000": 50.5692
+    },
+    "depth_limited": false,
+    "match_confidence": 0.837,
+    "signal": false,
+    "kalshi": {
+      "ticker": "KXPRESNOMD-28-WM",
+      "title": "Will Wes Moore be the Democratic Presidential nominee in 2028?",
+      "best_bid": 0.023,
+      "best_ask": 0.024
+    },
+    "polymarket": {
+      "question": "Will Wes Moore win the 2028 Democratic presidential nomination?",
+      "best_bid": 0.016,
+      "best_ask": 0.019
+    }
+  },
+  {
+    "pair_id": "KXPRESNOMD-28-MC__559662",
+    "direction": "buy_yes_polymarket_sell_kalshi",
+    "gross_spread_midpoint": 0.001,
+    "executable_spread_100": -0.0013,
+    "executable_spread_1000": -0.0058,
+    "fees_total": {
+      "100": 5.9213,
+      "1000": 21.2097
+    },
+    "depth_limited": false,
+    "match_confidence": 0.837,
+    "signal": false,
+    "kalshi": {
+      "ticker": "KXPRESNOMD-28-MC",
+      "title": "Will Mark Cuban be the Democratic Presidential nominee in 2028?",
+      "best_bid": 0.006,
+      "best_ask": 0.007
+    },
+    "polymarket": {
+      "question": "Will Mark Cuban win the 2028 Democratic presidential nomination?",
+      "best_bid": 0.005,
+      "best_ask": 0.006
+    }
+  },
+  {
+    "pair_id": "KXPRESNOMD-28-JSTE__559675",
+    "direction": "buy_yes_polymarket_sell_kalshi",
+    "gross_spread_midpoint": 0.0015,
+    "executable_spread_100": -0.0005,
+    "executable_spread_1000": -0.0077,
+    "fees_total": {
+      "100": 6.951,
+      "1000": 30.5057
+    },
+    "depth_limited": false,
+    "match_confidence": 0.837,
+    "signal": false,
+    "kalshi": {
+      "ticker": "KXPRESNOMD-28-JSTE",
+      "title": "Will Jon Stewart be the Democratic Presidential nominee in 2028?",
+      "best_bid": 0.007,
+      "best_ask": 0.009
+    },
+    "polymarket": {
+      "question": "Will Jon Stewart win the 2028 Democratic presidential nomination?",
+      "best_bid": 0.006,
+      "best_ask": 0.007
+    }
+  }
+]
