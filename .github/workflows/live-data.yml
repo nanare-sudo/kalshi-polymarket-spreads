@@ -2,7 +2,7 @@ name: Refresh live market data
 
 on:
   schedule:
-    - cron: "*/20 * * * *"    # alle 20 Minuten
+    - cron: "*/10 * * * *"   # GitHub fuehrt kurze Intervalle unzuverlaessig aus, daher enger getaktet
   workflow_dispatch:
 
 permissions:

@@ -231,7 +231,7 @@ def find_gaps(kalshi, poly, top=14):
             gap = abs(km["prob"] - pm["prob"])
             pairs.append({
                 "kalshi": {"title": km["title"], "prob": km["prob"], "vol24": km["vol24"], "id": km["id"]},
-                "polymarket": {"title": pm["title"], "prob": pm["prob"], "vol24": pm["vol24"], "slug": pm.get("slug")},
+                "polymarket": {"id": pm["id"], "title": pm["title"], "prob": pm["prob"], "vol24": pm["vol24"], "slug": pm.get("slug")},
                 "gap_pp": round(gap, 1), "match_score": round(jac, 2),
             })
     seen, uniq = set(), []

@@ -100,6 +100,11 @@ footer a{color:var(--mut);text-decoration:none;border-bottom:1px solid var(--lin
 footer a:hover{color:var(--acc)}
 .note{font-size:10.5px;color:var(--dim);padding:7px 14px;border-top:1px solid var(--line);line-height:1.5}
 .err{color:var(--warn);padding:14px;font-size:12px}
+
+/* Capture-Modus fuer Video-Rendering: keine Scanlines (Moire), ruhigere Kanten */
+html[data-capture] .scan{display:none}
+html[data-capture] body{font-size:16px}
+html[data-capture] .wrap{max-width:1860px;padding:26px 34px}
 </style>
 </head>
 <body>
@@ -163,10 +168,12 @@ let DATA = null, wallIdx = 0, actIdx = 0;
 
 async function load() {
   try {
-    const r = await fetch('../data/live.json?t=' + Date.now(), {cache: 'no-store'});
+    const r = await fetch(DATA_URL + '?t=' + Date.now(), {cache: 'no-store'});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     DATA = await r.json();
+    applyLivePrices();
     render();
+    if (FRAME === null) refreshPolymarket();
   } catch (e) {
     $('#age').textContent = 'data unavailable';
     $('#dot').classList.add('stale');
@@ -178,9 +185,56 @@ function ageLabel() {
   if (!DATA) return '';
   const mins = Math.max(0, Math.round((Date.now() - new Date(DATA.generated_at)) / 60000));
   $('#dot').classList.toggle('stale', mins > 45);
-  return mins < 1 ? 'updated just now'
-       : mins < 60 ? `updated ${mins} min ago`
-       : `data delayed — last update ${DATA.generated_at.slice(11,16)} UTC`;
+  const kalshi = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${DATA.generated_at.slice(11,16)}Z`;
+  const poly = livePoly.ts ? (Math.round((Date.now() - livePoly.ts) / 1000) < 90 ? 'live' : 'delayed') : '—';
+  return `polymarket ${poly} · kalshi ${kalshi}`;
+}
+
+// Polymarket erlaubt Browser-Requests (CORS *), Kalshi antwortet auf Origin-Header mit 403.
+// Deshalb werden die Polymarket-Preise direkt im Browser nachgeladen — unabhängig davon,
+// wann die serverseitige Aktualisierung zuletzt lief.
+const livePoly = { ts: 0, prices: new Map() };
+
+async function refreshPolymarket() {
+  if (!DATA) return;
+  const ids = new Set();
+  for (const key of ['most_active', 'probability_wall']) {
+    for (const m of DATA[key] || []) if (m.venue === 'polymarket') ids.add(m.id);
+  }
+  for (const g of DATA.cross_venue || []) if (g.polymarket?.id) ids.add(g.polymarket.id);
+  if (!ids.size) return;
+
+  const list = [...ids].slice(0, 60);
+  try {
+    const qs = list.map(id => `id=${encodeURIComponent(id)}`).join('&');
+    const r = await fetch(`https://gamma-api.polymarket.com/markets?${qs}&limit=100`, {cache: 'no-store'});
+    if (!r.ok) return;
+    const rows = await r.json();
+    for (const m of rows) {
+      try {
+        const p = parseFloat(JSON.parse(m.outcomePrices || '[]')[0]);
+        if (Number.isFinite(p)) livePoly.prices.set(String(m.id), Math.round(p * 1000) / 10);
+      } catch {}
+    }
+    livePoly.ts = Date.now();
+    applyLivePrices();
+    render();
+  } catch { /* Terminal zeigt weiter den letzten guten Stand */ }
+}
+
+function applyLivePrices() {
+  const upd = m => {
+    if (m.venue === 'polymarket' && livePoly.prices.has(m.id)) m.prob = livePoly.prices.get(m.id);
+  };
+  (DATA.most_active || []).forEach(upd);
+  (DATA.probability_wall || []).forEach(upd);
+  for (const g of DATA.cross_venue || []) {
+    const p = livePoly.prices.get(String(g.polymarket?.id));
+    if (p != null) {
+      g.polymarket.prob = p;
+      g.gap_pp = Math.round(Math.abs(g.kalshi.prob - p) * 10) / 10;
+    }
+  }
 }
 
 function render() {
@@ -246,11 +300,24 @@ function render() {
     </div>`).join('');
 }
 
-// Slow ambient rotation — designed for second-monitor viewing, no jarring motion
-setInterval(() => { wallIdx += 2; render(); }, 12000);
-setInterval(() => { actIdx += 3; render(); }, 17000);
-setInterval(() => { $('#age').textContent = ageLabel(); }, 30000);
-setInterval(load, 5 * 60 * 1000);
+// Capture-Modus: ?frame=N rendert einen deterministischen Zustand (für Video-Rendering),
+// ?data=<url> erlaubt einen abweichenden Datenpfad. Ohne Parameter läuft die Live-Rotation.
+const params = new URLSearchParams(location.search);
+const FRAME = params.has('frame') ? parseInt(params.get('frame'), 10) || 0 : null;
+const DATA_URL = params.get('data') || '../data/live.json';
+
+if (FRAME !== null) {
+  wallIdx = FRAME * 2;
+  actIdx = FRAME * 3;
+  document.documentElement.dataset.capture = '1';
+} else {
+  // Slow ambient rotation — designed for second-monitor viewing, no jarring motion
+  setInterval(() => { wallIdx += 2; render(); }, 12000);
+  setInterval(() => { actIdx += 3; render(); }, 17000);
+  setInterval(() => { $('#age').textContent = ageLabel(); }, 30000);
+  setInterval(load, 5 * 60 * 1000);
+  setInterval(refreshPolymarket, 60 * 1000);   // Polymarket sekundenaktuell im Browser
+}
 load();
 </script>
 </body>
