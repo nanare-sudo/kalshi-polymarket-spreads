@@ -9,3 +9,8 @@ ts,kind,name,users_total,users30,users7,runs30,runs30_ok,runs30_failed,reviews,r
 2026-08-20 07:08,actor,pdf-text-extractor-rag,2,1,1,0,0,0,0,0,0,,,,,,,,,
 2026-08-20 07:08,github,nanare-sudo/kalshi-polymarket-spreads,,,,,,,,,,0,0,0,0,0,,,,
 2026-08-20 07:08,pr,aarora4/Awesome-Prediction-Market-Tools#180,,,,,,,,,,,,,,,,open,False,0
+2026-08-21 07:09,actor,kalshi-weather-markets,2,1,1,1,1,0,0,0,0,,,,,,,,,
+2026-08-21 07:09,actor,prediction-spread-scanner,2,1,1,1,1,0,0,0,0,,,,,,,,,
+2026-08-21 07:09,actor,pdf-text-extractor-rag,2,1,1,1,1,0,0,0,0,,,,,,,,,
+2026-08-21 07:09,github,nanare-sudo/kalshi-polymarket-spreads,,,,,,,,,,0,0,0,0,0,,,,
+2026-08-21 07:09,pr,aarora4/Awesome-Prediction-Market-Tools#180,,,,,,,,,,,,,,,,open,False,0
